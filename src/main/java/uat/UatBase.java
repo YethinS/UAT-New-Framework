@@ -1,11 +1,8 @@
 package uat;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.FileNotFoundException;
-import java.time.Duration;
 
 
 public interface UatBase {
@@ -33,31 +30,31 @@ public interface UatBase {
 
     /**
      *  To find a web-element using css
-     * @param path : css selector (id,class etc. or combination of all)
+     * @param css : css selector (id,class etc. or combination of all)
      * @return a web-element
      */
-    WebElement locator(String path);
+    WebElement locator(String css);
 
     /**
      *  To find a web-element using xpath
-     * @param path : css selector (id,class etc. or combination of all)
+     * @param xpath : css selector (id,class etc. or combination of all)
      * @return a web-element
      */
-    WebElement xpathLocator(String path);
+    WebElement xpathLocator(String xpath);
 
     /**
      *   wait until element is visible
      *   default one using css to find element
-     * @param path : css selector (id,class etc. or combination of all)
+     * @param css : css selector (id,class etc. or combination of all)
      */
-    void waitMethod(String path);
+    void waitMethod(String css);
 
     /**
      *   wait until element is visible
      *   using xpath to find element
-     * @param path : css selector (id,class etc. or combination of all)
+     * @param css : css selector (id,class etc. or combination of all)
      */
-    void xpathWaitMethod(String path);
+    void xpathWaitMethod(String css);
 
     /**
      * Used to click a clickable web-element
@@ -110,19 +107,19 @@ public interface UatBase {
 
     /**
      *Used to send input to an element eg: text-box
-     * @param path: web-element's css path
+     * @param css: web-element's css selector
      * @param input: message tobe send to the element
      */
-    void elementInput(String path,String input);
+    void elementInput(String css, String input);
 
 
 
     /**
      *Used to send input to an element eg: text-box
-     * @param path: web-element's xpath
+     * @param xpath: web-element's xpath
      * @param input: message tobe send to the element
      */
-    void xpathElementInput(String path,String input);
+    void xpathElementInput(String xpath, String input);
 
     /**
      * Used to check whether  to strings are equal or not; if it not it will throw an error
