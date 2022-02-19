@@ -1,5 +1,9 @@
 package uat;
 
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -7,12 +11,8 @@ import org.openqa.selenium.io.FileHandler;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.BeforeTest;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
@@ -23,15 +23,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Properties;
 
 public class Base implements UatBase {
 
-// later we need to implement through excel or through property file
+
 	public static WebDriver driver;
 	public static Properties prop = new Properties();
-	public static FileReader fr;
+
 
 	// String URL = "https://release.ilearningengines.com/login";
 	// String URL = "https://www.google.com";
@@ -94,31 +93,31 @@ public class Base implements UatBase {
 	}
 
 //Wait method using css
-	public void waitMethod(String path) {
-		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(path)));
+	public void waitMethod(String css) {
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(css)));
 	}
 
 //Wait using xpath
-	public void xpathWaitMethod(String path) {
-		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(path)));
+	public void xpathWaitMethod(String css) {
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(css)));
 	}
 
-//Wait using Webelement
+//Wait using Web element
 	public WebElement webElementWait(WebElement ele) {
 		WebElement element = wait.until(ExpectedConditions.visibilityOf(ele));
 		return element;
 	}
 
 //Locator using css
-	public WebElement locator(String path) {
+	public WebElement locator(String css) {
 		//waitMethod(path);
-		return driver.findElement(By.cssSelector(path));
+		return driver.findElement(By.cssSelector(css));
 	}
 
-//Loctaor using xpath
-	public WebElement xpathLocator(String path) {
-		xpathWaitMethod(path);
-		return driver.findElement(By.xpath(path));
+//Locator using xpath
+	public WebElement xpathLocator(String xpath) {
+		xpathWaitMethod(xpath);
+		return driver.findElement(By.xpath(xpath));
 	}
 
 	// Click functionality
@@ -164,21 +163,21 @@ public class Base implements UatBase {
 		}
 	}
 
-//Sendkeys using webelement
+//Send-keys using web-element
 	public void elementInput(WebElement ele, String input) {
 		ele.clear();
 		ele.sendKeys(input);
 	}
 
-//Sendkeys using direct path
+//Send-keys using direct path
 	public void elementInput(String path, String input) {
 		WebElement element = locator(path);
 		element.clear();
 		element.sendKeys(input);
 	}
 
-	public void xpathElementInput(String path, String input) {
-		WebElement element = xpathLocator(path);
+	public void xpathElementInput(String xpath, String input) {
+		WebElement element = xpathLocator(xpath);
 		element.clear();
 		element.sendKeys(input);
 	}
@@ -194,10 +193,16 @@ public class Base implements UatBase {
 		return driver.getTitle();
 	}
 
+	/**
+	 *
+	 * @param fileName : name of the config file without extension "properties "
+	 * @param key : "key" of the key value pair
+	 * @return returns string value
+	 */
 	//Config properties
-	public String propertyRead(String path,String key){
+	public static String propertyRead(String fileName, String key){
 		try {
-			FileReader fr = new FileReader("D:/Selenium-Projects/UAT-New-Framework/configfiles/"+path);
+			FileReader fr = new FileReader("./configfiles/"+fileName+".properties");
 			try {
 				prop.load(fr);
 			} catch (IOException e) {
@@ -210,4 +215,55 @@ public class Base implements UatBase {
 		return keyValue;
 
 	}
+
+	/**
+	 *
+	 * @param fileName - filename of the Excel file without extension
+	 * @return it returns 2 dimensional array of string
+	 */
+	public static String[][] excelFileRead(String fileName) {
+		/*
+		 * XSSFSheet  for  selecting sheet from excel-sheet index of 0 indicate first sheet
+		 * sheet-getLastRoeNum(); for getting lastRowNum
+		 *
+		 * for loop for iterating row and cell
+		 * first loop for row
+		 * second loop for cell
+		 *
+		 */
+		XSSFWorkbook wbook = null;
+		try {
+			wbook = new XSSFWorkbook("./Utils/"+fileName+".xlsx");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		XSSFSheet sheet = wbook.getSheetAt(0);
+
+		int lastRowNum = sheet.getLastRowNum();
+		short lastCellNum = sheet.getRow(0).getLastCellNum();
+		String[][] data=new String[lastRowNum][lastCellNum];
+
+		for (int i = 1; i <= lastRowNum; i++) {
+			XSSFRow row = sheet.getRow(i);
+			for (int j = 0; j < lastCellNum; j++) {
+				XSSFCell cell = row.getCell(j);
+				String value = cell.getStringCellValue();
+				data [i-1][j]= value;
+			}
+		}
+		try {
+			wbook.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return data;
+
+	}
+
+
+
+
+
+
 }
